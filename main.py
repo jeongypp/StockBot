@@ -5,17 +5,29 @@ import time
 import os # os 기능 추가
 
 # ==========================================
-# 1. 사용자 설정 (여기를 수정하세요!)
+# 1. 사용자 설정
 # ==========================================
-# 아까 적어둔 봇 토큰과 숫자 ID를 따옴표 안에 넣으세요
-TOKEN = os.environ.get('TELEGRAM_TOKEN')
-CHAT_ID = os.environ.get('CHAT_ID')
+try:
+    # 1순위: 내 컴퓨터에 my_secrets.py가 있다면 거기서 가져온다.
+    from my_secrets import TELEGRAM_TOKEN, CHAT_ID
+    TOKEN = TELEGRAM_TOKEN
+    print(">>> 로컬 모드: my_secrets.py에서 토큰을 로드했습니다.")
+    
+except ImportError:
+    # 2순위: 파일이 없다면(깃허브 서버), 환경변수(금고)에서 가져온다.
+    TOKEN = os.environ.get('TELEGRAM_TOKEN')
+    CHAT_ID = os.environ.get('CHAT_ID')
+    print(">>> 서버 모드: 환경변수에서 토큰을 로드했습니다.")      
 
 # 나의 포트폴리오 (종목명: 종목코드)
 MY_STOCKS = {
+    # 미국 ETF
     "SOL 미국테크TOP10": "481190",
     "TIGER 미국S&P500": "360750",
-    "TIGER 미국배당다우존스": "458730"
+    "TIGER 미국배당다우존스": "458730",
+    # 국내 대장주
+    "삼성전자": "005930",
+    "SK하이닉스": "000660"
 }
 
 # ==========================================
@@ -90,7 +102,7 @@ for name, code in MY_STOCKS.items():
         alert_messages.append(msg)
     time.sleep(1) # 차단 방지를 위해 1초 쉬기
 
-# 알림 보낼 게 있으면 텔레그램 전송
+    # 알림 보낼 게 있으면 텔레그램 전송
 if alert_messages:
     final_report = "📢 [투자 알림] 매수 신호가 포착되었습니다!\n\n" + "\n\n".join(alert_messages)
     send_telegram_msg(final_report)
