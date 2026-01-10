@@ -1,0 +1,33 @@
+name: 정엽의 주식 알림 봇_1
+
+on:
+  # 매일 한국 시간 오전 8시 30분 (UTC 23:30) 자동 실행
+  schedule:
+    - cron: '30 23 * * *'
+  
+  # 수동 실행 버튼 (테스트용)
+  workflow_dispatch:
+
+jobs:
+  run-stock-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 코드 가져오기
+      uses: actions/checkout@v3
+
+    - name: 파이썬 설정 (3.9)
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: 라이브러리 설치
+      run: |
+        pip install finance-datareader pandas requests lxml plotly
+
+    - name: 봇 실행
+      env:
+        # 깃허브 설정(Secrets)에 저장된 열쇠를 꺼내줌
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        CHAT_ID: ${{ secrets.CHAT_ID }}
+      run: python main.py
